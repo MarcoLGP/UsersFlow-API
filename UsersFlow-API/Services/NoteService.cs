@@ -58,19 +58,10 @@ namespace UsersFlow_API.Services
                 {
                     Title = obj.Title,
                     NoteId = obj.NoteId,
-                    Created = obj.Created
+                    Created = obj.Created,
+                    Content = obj.Content
                 };
             });
-        }
-
-        public async Task<string?> getNoteContent(int noteId)
-        {
-            var noteFound = await _noteRepository.getNoteById(noteId);
-
-            if (noteFound is null) 
-                return null;
-
-            return noteFound.Content;
         }
     }
 }

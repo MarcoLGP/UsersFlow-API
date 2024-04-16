@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using UsersFlow_API.DTOs;
 using UsersFlow_API.Services;
+using UsersFlow_API.Utils;
 
 namespace UsersFlow_API.Controllers
 {
@@ -10,20 +12,25 @@ namespace UsersFlow_API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
         private readonly ITokenService _tokenService;
         private readonly IConfiguration _configuration;
         private readonly IUserRefreshTokenService _userRefreshTokenService;
+        private readonly ICryptoService _cryptoService;
 
-        public AuthController(IUserService userService,
-            ITokenService tokenService,
-            IConfiguration configuration,
-            IUserRefreshTokenService userRefreshTokenService)
+        public AuthController(
+            IAuthService authService, 
+            ITokenService tokenService, 
+            IConfiguration configuration, 
+            IUserRefreshTokenService userRefreshTokenService, 
+            ICryptoService cryptoService
+            )
         {
-            _userService = userService;
+            _authService = authService;
             _tokenService = tokenService;
             _configuration = configuration;
             _userRefreshTokenService = userRefreshTokenService;
+            _cryptoService = cryptoService;
         }
 
         private string GenerateStringToken(int userId)
@@ -45,7 +52,7 @@ namespace UsersFlow_API.Controllers
         {
             try
             {
-                var newUser = await _userService.signUpUser(signUpDTO.Name, signUpDTO.Email, signUpDTO.Password);
+                var newUser = await _authService.signUpUser(signUpDTO.Name, signUpDTO.Email, signUpDTO.Password);
 
                 if (newUser is null)
                     return Conflict("Usuário já cadastrado");
@@ -57,29 +64,31 @@ namespace UsersFlow_API.Controllers
 
                 return Ok(new TokenDTO { Token = token, RefreshToken = refreshToken });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return BadRequest("Não foi possível processar a operação");
             }
         }
 
         [HttpPost]
         [Route(template: "sign-in")]
-        public async Task<ActionResult<TokenDTO>> SignIn([FromBody] SignInDTO signInDTO)
+        public async Task<ActionResult<SignInResponseDTO>> SignIn([FromBody] SignInDTO signInDTO)
         {
             try
             {
-                var userSigned = await _userService.signInUser(signInDTO.Email, signInDTO.Password);
+                var userSigned = await _authService.signInUser(signInDTO.Email, signInDTO.Password);
+
 
                 if (userSigned is null)
-                    return Unauthorized("Usuário não encontrado");
+                    return Conflict("Usuário não encontrado");
 
                 var token = GenerateStringToken(userSigned.UserId);
                 var refreshToken = _tokenService.GenerateRefreshToken();
 
                 await _userRefreshTokenService.addUserRefreshToken(refreshToken, userSigned.UserId);
 
-                return Ok(new TokenDTO { Token = token, RefreshToken = refreshToken });
+                return Ok(new SignInResponseDTO { Token = token, RefreshToken = refreshToken, Name = userSigned.Name });
             }
             catch (Exception)
             {
@@ -87,21 +96,27 @@ namespace UsersFlow_API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
-        [Route(template: "check-token")]
-        public ActionResult CheckToken([FromBody] string Token)
+        [Route(template: "sign-out")]
+        public async Task<ActionResult> SignOut([FromBody] SignOutDTO signOutDTO)
         {
             try
             {
-                _ = _tokenService.GetClaimsPrincipalFromExpiredToken(Token, _configuration);
+                var tokenRequest = AppUtils.RemovePrefixBearer(Request.Headers["Authorization"]!);
+                var userId = AppUtils.GetIntTokenUserId(tokenRequest, _tokenService, _configuration);
+
+                await _userRefreshTokenService.removeUserRefreshToken(signOutDTO.RefreshToken, userId);
+                
                 return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest("Não foi possível processar a operação");
             }
         }
 
+        [Authorize]
         [HttpPost]
         [Route(template: "refresh-token")]
         public async Task<ActionResult<TokenDTO>> ValidateToken([FromBody] TokenDTO tokenDTO)

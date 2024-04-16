@@ -30,23 +30,16 @@ namespace UsersFlow_API.Repositories
             return user;
         }
 
-        public async Task<User?> updateUserPassword(User user, string newPassword)
+        public async Task<User?> updateUser(User user)
         {
-            user.Password = newPassword;
-            await _dbContext.SaveChangesAsync();
-            return user;
-        }
-
-        public async Task<User?> updateUserEmail(User user, string newEmail)
-        {
-            user.Email = newEmail;
+            _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
             return user;
         }
 
         public async Task<User?> getUserByEmailAndPassword(string email, string password)
         {
-            User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+            User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() && u.Password == password);
             return user;
         }
     }

@@ -25,5 +25,16 @@ namespace UsersFlow_API.Services
         {
             await _userRefreshTokenRepository.addUserRefreshToken(userRefreshToken, userId);
         }
+
+        public async Task<bool?> removeUserRefreshToken(string userRefreshToken, int userId)
+        {
+            var userRefreshTokenFound = await getUserRefreshToken(userRefreshToken, userId);
+
+            if (userRefreshTokenFound is null)
+                return null;
+
+            await _userRefreshTokenRepository.removeUserRefreshToken(userRefreshTokenFound);            
+            return true;
+        }
     }
 }

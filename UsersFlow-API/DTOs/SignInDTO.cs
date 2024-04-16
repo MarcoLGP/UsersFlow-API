@@ -12,4 +12,11 @@ namespace UsersFlow_API.DTOs
         [MinLength(5, ErrorMessage = "Password deve ter no mínimo 5 caracteres")]
         public string Password { get; set; }
     }
+
+    public class SignInResponseDTO
+    {
+        public string Name { get; set; }
+        public string Token { get; set; }
+        public string RefreshToken { get; set; }
+    }
 }

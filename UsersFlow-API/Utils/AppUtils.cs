@@ -1,4 +1,8 @@
-﻿namespace UsersFlow_API.Utils
+﻿using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
+using UsersFlow_API.Services;
+
+namespace UsersFlow_API.Utils
 {
     public static class AppUtils
     {
@@ -17,6 +21,15 @@
             }
 
             return token;
+        }
+
+        public static int GetIntTokenUserId(string tokenRequest, ITokenService _tokenService, IConfiguration _configuration)
+        {
+            var principal = _tokenService.GetClaimsPrincipalFromExpiredToken(tokenRequest, _configuration);
+            var idUserToken = principal.FindFirstValue("Id");
+            var intIdUser = int.Parse(idUserToken!);
+
+            return intIdUser;
         }
     }
 }

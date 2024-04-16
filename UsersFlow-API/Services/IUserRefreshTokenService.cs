@@ -7,5 +7,6 @@ namespace UsersFlow_API.Services
         public Task<UserRefreshToken?> getUserRefreshToken(string refreshToken, int userId);
         public Task updateUserRefreshToken(UserRefreshToken userRefreshToken, string newUserRefreshToken, int userId);
         public Task addUserRefreshToken(string userRefreshToken, int userId);
+        public Task<bool?> removeUserRefreshToken(string userRefreshToken, int userId);
     }
 }

@@ -1,11 +1,12 @@
-﻿using System.Security.Claims;
-using UsersFlow_API.Models;
+﻿using UsersFlow_API.DTOs;
 
 namespace UsersFlow_API.Services
 {
     public interface IUserService
     {
-        public Task<User?> signInUser(string email, string password);
-        public Task<User?> signUpUser(string name, string email, string password);
+        public Task<bool?> updateUserName(int userId, string newName);
+        public Task<bool?> updateUserEmail(int userId, string newEmail);
+        public Task<bool?> updateUserPassword(int userId, string newPassword, string oldPassword);
+        public Task<bool?> removeUser(int userId);
     }
 }

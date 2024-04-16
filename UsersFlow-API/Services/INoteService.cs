@@ -9,6 +9,5 @@ namespace UsersFlow_API.Services
         public Task<bool?> removeNote(int noteId);
         public Task<bool?> updateNote(NoteResumeDTO note, int noteId);
         public Task<IEnumerable<NoteDTO>?> getAllNotesByUser(int userId);
-        public Task<string?> getNoteContent(int noteId);
     }
 }

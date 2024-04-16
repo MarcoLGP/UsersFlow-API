@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using UsersFlow_API.DTOs;
 using UsersFlow_API.Models;
 using UsersFlow_API.Services;
@@ -24,44 +23,16 @@ namespace UsersFlow_API.Controllers
             _configuration = configuration;
         }
 
-        private int GetIntTokenUserId(string tokenRequest)
-        {
-            var principal = _tokenService.GetClaimsPrincipalFromExpiredToken(tokenRequest, _configuration);
-            var idUserToken = principal.FindFirstValue("Id");
-            var intIdUser = int.Parse(idUserToken!);
-
-            return intIdUser;
-        }
-
         [HttpGet]
         public async Task<ActionResult<IEnumerable<NoteDTO>>> Get()
         {
             try
             {
                 var tokenRequest = AppUtils.RemovePrefixBearer(Request.Headers["Authorization"]!);
-                var intIdUser = GetIntTokenUserId(tokenRequest);
+                var intIdUser = AppUtils.GetIntTokenUserId(tokenRequest, _tokenService, _configuration);
                 var notes = await _noteService.getAllNotesByUser(intIdUser);
 
                 return Ok(notes);
-            }
-            catch (Exception)
-            {
-                return BadRequest("Não foi possível processar a operação");
-            }
-        }
-
-        [HttpGet]
-        [Route(template: "{noteId:int}")]
-        public async Task<ActionResult<IEnumerable<string>>> GetNoteContent(int noteId)
-        {
-            try
-            {
-                var content = await _noteService.getNoteContent(noteId);
-
-                if (content is null)
-                    return NotFound("Nota não encontrada");
-
-                return Ok(content);
             }
             catch (Exception)
             {
@@ -75,22 +46,21 @@ namespace UsersFlow_API.Controllers
             try
             {
                 var tokenRequest = AppUtils.RemovePrefixBearer(Request.Headers["Authorization"]!);
-                var intIdUser = GetIntTokenUserId(tokenRequest);
+                var intIdUser = AppUtils.GetIntTokenUserId(tokenRequest, _tokenService, _configuration);
 
                 Note newNote = new Note()
                 {
                     Title = newNoteDTO.Title,
                     Content = newNoteDTO.Content,
-                    Created = newNoteDTO.Created,
+                    Created = DateTime.Now,
                     UserId = intIdUser
                 };
 
                 await _noteService.addNote(newNote);
                 return Created();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
                 return BadRequest("Não foi possível processar a operação");
             }
         }
