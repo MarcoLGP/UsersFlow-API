@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UsersFlow_API.Context;
 
@@ -11,9 +12,11 @@ using UsersFlow_API.Context;
 namespace UsersFlow_API.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240416133458_AdjustUserPasswordStringSize")]
+    partial class AdjustUserPasswordStringSize
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,12 +39,6 @@ namespace UsersFlow_API.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime");
-
-                    b.Property<bool>("Locked")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Public")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Title")
                         .IsRequired()

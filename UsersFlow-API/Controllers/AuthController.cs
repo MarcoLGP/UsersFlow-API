@@ -64,9 +64,8 @@ namespace UsersFlow_API.Controllers
 
                 return Ok(new TokenDTO { Token = token, RefreshToken = refreshToken });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
                 return BadRequest("Não foi possível processar a operação");
             }
         }
@@ -79,9 +78,8 @@ namespace UsersFlow_API.Controllers
             {
                 var userSigned = await _authService.signInUser(signInDTO.Email, signInDTO.Password);
 
-
                 if (userSigned is null)
-                    return Conflict("Usuário não encontrado");
+                    return Conflict("Credenciais fornecidas inválidas");
 
                 var token = GenerateStringToken(userSigned.UserId);
                 var refreshToken = _tokenService.GenerateRefreshToken();
@@ -119,11 +117,12 @@ namespace UsersFlow_API.Controllers
         [Authorize]
         [HttpPost]
         [Route(template: "refresh-token")]
-        public async Task<ActionResult<TokenDTO>> ValidateToken([FromBody] TokenDTO tokenDTO)
+        public async Task<ActionResult<TokenDTO>> ValidateToken([FromBody] RefreshTokenDTO refreshTokenDTO)
         {
             try
             {
-                ClaimsPrincipal principal = _tokenService.GetClaimsPrincipalFromExpiredToken(tokenDTO.Token, _configuration);
+                var tokenRequest = AppUtils.RemovePrefixBearer(Request.Headers["Authorization"]!);
+                ClaimsPrincipal principal = _tokenService.GetClaimsPrincipalFromExpiredToken(tokenRequest, _configuration);
                 var idUserToken = principal.FindFirstValue("Id");
 
                 if (idUserToken is null)
@@ -132,7 +131,7 @@ namespace UsersFlow_API.Controllers
                 if (!int.TryParse(idUserToken, out int intIdUserToken))
                     return BadRequest("Token inválido");
 
-                var userRefreshToken = await _userRefreshTokenService.getUserRefreshToken(tokenDTO.RefreshToken, intIdUserToken);
+                var userRefreshToken = await _userRefreshTokenService.getUserRefreshToken(refreshTokenDTO.RefreshToken, intIdUserToken);
                 
                 if (userRefreshToken is null)
                     return BadRequest("Token inválido");

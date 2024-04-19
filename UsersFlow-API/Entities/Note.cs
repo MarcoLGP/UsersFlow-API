@@ -17,6 +17,10 @@ namespace UsersFlow_API.Models
         [Column(TypeName = "datetime")]
         public DateTime Created { get; set; } = DateTime.Now;
         [Required]
+        public bool Locked { get; set; }
+        [Required]
+        public bool Public { get; set; }
+        [Required]
         [Column(TypeName = "int")]
         public int UserId { get; set; }
         [Required]

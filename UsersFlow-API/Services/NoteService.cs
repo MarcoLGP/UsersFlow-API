@@ -39,6 +39,8 @@ namespace UsersFlow_API.Services
 
             note.Title = noteResumeDTO.Title;
             note.Content = noteResumeDTO.Content;
+            note.Public = noteResumeDTO.Public;
+            note.Locked = noteResumeDTO.Locked;
 
             await _noteRepository.updateNote(note);
 
@@ -59,7 +61,9 @@ namespace UsersFlow_API.Services
                     Title = obj.Title,
                     NoteId = obj.NoteId,
                     Created = obj.Created,
-                    Content = obj.Content
+                    Content = obj.Content,
+                    Locked = obj.Locked,
+                    Public = obj.Public
                 };
             });
         }

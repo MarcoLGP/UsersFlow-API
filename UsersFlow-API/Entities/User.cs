@@ -19,7 +19,7 @@ namespace UsersFlow_API.Models
         [Column(TypeName = "nvarchar(60)")]
         public string Email { get; set; }
         [Required]
-        [Column(TypeName = "nvarchar(40)")]
+        [Column(TypeName = "nvarchar(100)")]
         public string Password { get; set; }
         public ICollection<Note>? Notes { get; set; }
     }

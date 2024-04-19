@@ -5,8 +5,15 @@ namespace UsersFlow_API.Services
 {
     public class CryptoService : ICryptoService
     {
-        public string decrypt(string encryptedText, string key)
+        private readonly IConfiguration _configuration;
+        public CryptoService(IConfiguration configuration)
         {
+            _configuration = configuration;
+        }
+
+        public string decrypt(string encryptedText)
+        {
+            string key = _configuration.GetSection("crypto").GetValue<string>("key") ?? throw new Exception("Invalid key");
             // Converter a chave para bytes
             byte[] keyBytes = Encoding.UTF8.GetBytes(key);
 
@@ -35,6 +42,41 @@ namespace UsersFlow_API.Services
                         // Converter os bytes descriptografados em uma string UTF-8
                         return Encoding.UTF8.GetString(decryptedBytes, 0, decryptedByteCount);
                     }
+                }
+            }
+        }
+
+        public string encrypt(string plaintext)
+        {
+            string key = _configuration.GetSection("crypto").GetValue<string>("key") ?? throw new Exception("Invalid key");
+            // Converter a chave para bytes
+            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+
+            // Converter a string para bytes UTF-8
+            byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
+
+            // Configurar o objeto AES para criptografar
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = keyBytes;
+                aes.Mode = CipherMode.ECB; // Mesmo modo usado na descriptografia
+                aes.Padding = PaddingMode.PKCS7; // Mesmo preenchimento usado na descriptografia
+
+                // Criar um cifrador
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+                // Criar um fluxo de memória para armazenar os dados criptografados
+                using (var ms = new MemoryStream())
+                {
+                    using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    {
+                        // Escrever os bytes criptografados no fluxo de criptografia
+                        cs.Write(plaintextBytes, 0, plaintextBytes.Length);
+                    }
+
+                    // Obter os bytes criptografados do fluxo de memória e convertê-los para uma string base64
+                    byte[] encryptedBytes = ms.ToArray();
+                    return Convert.ToBase64String(encryptedBytes);
                 }
             }
         }

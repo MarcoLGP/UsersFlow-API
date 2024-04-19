@@ -5,12 +5,13 @@ namespace UsersFlow_API.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ICryptoService _cryptoService;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, ICryptoService cryptoService)
         {
             _userRepository = userRepository;
+            _cryptoService = cryptoService;
         }
-
         private async Task<bool?> UpdateUser(int userId, string propToUpdate, string newValue)
         {
             var userFound = await _userRepository.getUserById(userId);
@@ -57,10 +58,10 @@ namespace UsersFlow_API.Services
             if (userFound is null)
                 return null;
 
-            if (userFound.Password != oldPassword)
+            if (_cryptoService.decrypt(userFound.Password) != oldPassword)
                 return false;
 
-            userFound.Password = newPassword;
+            userFound.Password = _cryptoService.encrypt(newPassword);
             await _userRepository.updateUser(userFound);
             
             return true;
