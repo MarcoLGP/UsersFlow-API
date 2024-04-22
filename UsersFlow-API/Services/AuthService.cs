@@ -21,7 +21,7 @@ namespace UsersFlow_API.Services
 
         public async Task<User?> signUpUser(string name, string email, string password)
         {
-            var userFound = await _userRepository.getUserByEmailAndPassword(email, _cryptoService.encrypt(password));
+            var userFound = await _userRepository.getUserByEmail(email);
             if (userFound is not null)
             {
                 return null;

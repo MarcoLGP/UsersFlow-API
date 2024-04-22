@@ -37,14 +37,14 @@ namespace UsersFlow_API.Controllers
                 
                 if (isUserUpdated is null)
                 {
-                    return NotFound("Não foi possível localizar o usuário");
+                    return NotFound(new MessageReturnDTO { Message = "Não foi possível localizar o usuário" });
                 }
 
                 return Created();
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possivel processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possivel processar a operação" });
             }
         }
 
@@ -60,14 +60,14 @@ namespace UsersFlow_API.Controllers
                 var isUserUpdated = await _userService.updateUserEmail(userId, userEmailDTO.Email);
 
                 if (isUserUpdated is null)
-                    return NotFound("Não foi possível localizar o usuário");
+                    return NotFound(new MessageReturnDTO { Message = "Não foi possível localizar o usuário" });
 
                 return Created();
 
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possivel processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possivel processar a operação" });
             }
         }
 
@@ -84,16 +84,16 @@ namespace UsersFlow_API.Controllers
                 var isUserUpdated = await _userService.updateUserPassword(userId, userPasswordDTO.NewPassword, userPasswordDTO.OldPassword);
 
                 if (isUserUpdated is null)
-                    return NotFound("Não foi possível localizar o usuário");
+                    return NotFound(new MessageReturnDTO { Message = "Não foi possível localizar o usuário" });
 
                 if (isUserUpdated == false)
-                    return Conflict("Senha incorreta");
+                    return Conflict(new MessageReturnDTO { Message = "Senha incorreta" });
 
                 return Created();
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possivel processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possivel processar a operação" });
             }
         }
 
@@ -109,7 +109,7 @@ namespace UsersFlow_API.Controllers
 
                 if (isUserRemoved is null)
                 {
-                    return NotFound("Não foi possível localizar o usuário");
+                    return NotFound(new MessageReturnDTO { Message = "Não foi possível localizar o usuário" });
                 }
 
                 return Created();
@@ -117,7 +117,7 @@ namespace UsersFlow_API.Controllers
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possivel processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possivel processar a operação" });
             }
         }
     }

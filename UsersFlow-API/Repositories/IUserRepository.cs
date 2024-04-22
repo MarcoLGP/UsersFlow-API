@@ -9,5 +9,6 @@ namespace UsersFlow_API.Repositories
         public Task<User?> updateUser(User user);
         public Task<bool?> deleteUser(User user);
         public Task<User?> getUserByEmailAndPassword(string email, string password);
+        public Task<User?> getUserByEmail(string email);
     }
 }

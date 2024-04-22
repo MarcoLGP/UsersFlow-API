@@ -36,7 +36,7 @@ namespace UsersFlow_API.Controllers
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possível processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }
 
@@ -61,7 +61,7 @@ namespace UsersFlow_API.Controllers
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possível processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }
 
@@ -74,13 +74,13 @@ namespace UsersFlow_API.Controllers
                 var isDeleted = await _noteService.removeNote(noteId);
 
                 if (isDeleted is null)
-                    return NotFound("Nota não encontrada");
+                    return NotFound(new MessageReturnDTO { Message = "Nota não encontrada" });
 
                 return Ok();
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possível processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }
 
@@ -93,13 +93,13 @@ namespace UsersFlow_API.Controllers
                 var isUpdated = await _noteService.updateNote(noteResumeDTO, noteId);
 
                 if (isUpdated is null)
-                    return NotFound("Nota não encontrada");
+                    return NotFound(new MessageReturnDTO { Message = "Nota não encontrada" });
 
                 return Ok();
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possível processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }
 

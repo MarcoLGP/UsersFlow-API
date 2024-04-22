@@ -16,21 +16,18 @@ namespace UsersFlow_API.Controllers
         private readonly ITokenService _tokenService;
         private readonly IConfiguration _configuration;
         private readonly IUserRefreshTokenService _userRefreshTokenService;
-        private readonly ICryptoService _cryptoService;
 
         public AuthController(
             IAuthService authService, 
             ITokenService tokenService, 
             IConfiguration configuration, 
-            IUserRefreshTokenService userRefreshTokenService, 
-            ICryptoService cryptoService
+            IUserRefreshTokenService userRefreshTokenService
             )
         {
             _authService = authService;
             _tokenService = tokenService;
             _configuration = configuration;
             _userRefreshTokenService = userRefreshTokenService;
-            _cryptoService = cryptoService;
         }
 
         private string GenerateStringToken(int userId)
@@ -55,7 +52,7 @@ namespace UsersFlow_API.Controllers
                 var newUser = await _authService.signUpUser(signUpDTO.Name, signUpDTO.Email, signUpDTO.Password);
 
                 if (newUser is null)
-                    return Conflict("Usuário já cadastrado");
+                    return Conflict(new MessageReturnDTO { Message = "Usuário já cadastrado" });
 
                 var token = GenerateStringToken(newUser.UserId);
                 var refreshToken = _tokenService.GenerateRefreshToken();
@@ -66,7 +63,7 @@ namespace UsersFlow_API.Controllers
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possível processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }
 
@@ -79,7 +76,7 @@ namespace UsersFlow_API.Controllers
                 var userSigned = await _authService.signInUser(signInDTO.Email, signInDTO.Password);
 
                 if (userSigned is null)
-                    return Conflict("Credenciais fornecidas inválidas");
+                    return Unauthorized(new MessageReturnDTO { Message = "Credenciais fornecidas inválidas" });
 
                 var token = GenerateStringToken(userSigned.UserId);
                 var refreshToken = _tokenService.GenerateRefreshToken();
@@ -90,7 +87,7 @@ namespace UsersFlow_API.Controllers
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possível processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }
 
@@ -110,7 +107,7 @@ namespace UsersFlow_API.Controllers
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possível processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }
 
@@ -126,15 +123,15 @@ namespace UsersFlow_API.Controllers
                 var idUserToken = principal.FindFirstValue("Id");
 
                 if (idUserToken is null)
-                    return BadRequest("Token inválido");
+                    return BadRequest(new MessageReturnDTO { Message = "Token inválido" });
 
                 if (!int.TryParse(idUserToken, out int intIdUserToken))
-                    return BadRequest("Token inválido");
+                    return BadRequest(new MessageReturnDTO { Message = "Token inválido" });
 
                 var userRefreshToken = await _userRefreshTokenService.getUserRefreshToken(refreshTokenDTO.RefreshToken, intIdUserToken);
                 
                 if (userRefreshToken is null)
-                    return BadRequest("Token inválido");
+                    return BadRequest(new MessageReturnDTO { Message = "Token inválido" });
 
                 var newUserRefreshToken = _tokenService.GenerateRefreshToken();
                 await _userRefreshTokenService.updateUserRefreshToken(userRefreshToken, newUserRefreshToken, intIdUserToken);
@@ -145,7 +142,7 @@ namespace UsersFlow_API.Controllers
             }
             catch (Exception)
             {
-                return BadRequest("Não foi possível processar a operação");
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }
     }

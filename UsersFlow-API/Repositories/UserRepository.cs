@@ -13,8 +13,7 @@ namespace UsersFlow_API.Repositories
         }
         public async Task<User?> getUserById(int userId)
         {
-            User? userFound = await _dbContext.Users.FirstOrDefaultAsync(x => x.UserId == userId);
-            return userFound;
+            return await _dbContext.Users.FirstOrDefaultAsync(x => x.UserId == userId);
         }
         public async Task<bool?> deleteUser(User user)
         {
@@ -39,8 +38,12 @@ namespace UsersFlow_API.Repositories
 
         public async Task<User?> getUserByEmailAndPassword(string email, string password)
         {
-            User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() && u.Password == password);
-            return user;
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() && u.Password == password);
+        }
+
+        public async Task<User?> getUserByEmail(string email)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
         }
     }
 }
