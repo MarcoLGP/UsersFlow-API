@@ -2,7 +2,7 @@
 
 namespace UsersFlow_API.DTOs
 {
-    public class SignInDTO
+    public class SignInRequestDTO
     {
         [EmailAddress(ErrorMessage = "Email inválido")]
         [MaxLength(60)]
@@ -16,6 +16,7 @@ namespace UsersFlow_API.DTOs
     public class SignInResponseDTO
     {
         public string Name { get; set; }
+        public string Email { get; set; }
         public string Token { get; set; }
         public string RefreshToken { get; set; }
     }

@@ -2,7 +2,7 @@
 
 namespace UsersFlow_API.DTOs
 {
-    public class SignOutDTO
+    public class SignOutRequestDTO
     {
         [Required(ErrorMessage = "O campo RefreshToken é obrigatório")]
         public string RefreshToken { get; set; }

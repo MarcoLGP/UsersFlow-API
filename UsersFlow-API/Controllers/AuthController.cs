@@ -69,7 +69,7 @@ namespace UsersFlow_API.Controllers
 
         [HttpPost]
         [Route(template: "sign-in")]
-        public async Task<ActionResult<SignInResponseDTO>> SignIn([FromBody] SignInDTO signInDTO)
+        public async Task<ActionResult<SignInResponseDTO>> SignIn([FromBody] SignInRequestDTO signInDTO)
         {
             try
             {
@@ -83,7 +83,7 @@ namespace UsersFlow_API.Controllers
 
                 await _userRefreshTokenService.addUserRefreshToken(refreshToken, userSigned.UserId);
 
-                return Ok(new SignInResponseDTO { Token = token, RefreshToken = refreshToken, Name = userSigned.Name });
+                return Ok(new SignInResponseDTO { Token = token, RefreshToken = refreshToken, Name = userSigned.Name, Email = userSigned.Email });
             }
             catch (Exception)
             {
@@ -94,7 +94,7 @@ namespace UsersFlow_API.Controllers
         [Authorize]
         [HttpPost]
         [Route(template: "sign-out")]
-        public async Task<ActionResult> SignOut([FromBody] SignOutDTO signOutDTO)
+        public async Task<ActionResult> SignOut([FromBody] SignOutRequestDTO signOutDTO)
         {
             try
             {
@@ -111,7 +111,6 @@ namespace UsersFlow_API.Controllers
             }
         }
 
-        [Authorize]
         [HttpPost]
         [Route(template: "refresh-token")]
         public async Task<ActionResult<TokenDTO>> ValidateToken([FromBody] RefreshTokenDTO refreshTokenDTO)

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using UsersFlow_API.DTOs;
 using UsersFlow_API.Services;
 using UsersFlow_API.Utils;
@@ -61,9 +60,10 @@ namespace UsersFlow_API.Controllers
 
                 if (isUserUpdated is null)
                     return NotFound(new MessageReturnDTO { Message = "Não foi possível localizar o usuário" });
+                else if (isUserUpdated == false)
+                    return Conflict("E-mail já utilizado");
 
                 return Created();
-
             }
             catch (Exception)
             {

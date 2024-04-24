@@ -43,6 +43,11 @@ namespace UsersFlow_API.Services
 
         public async Task<bool?> updateUserEmail(int userId, string newEmail)
         {
+            var userFound = await _userRepository.getUserByEmail(newEmail);
+
+            if (userFound is not null)
+                return false;
+
             return await UpdateUser(userId, "email", newEmail);
         }
 
