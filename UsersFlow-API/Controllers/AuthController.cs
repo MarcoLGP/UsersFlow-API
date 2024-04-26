@@ -118,7 +118,9 @@ namespace UsersFlow_API.Controllers
             try
             {
                 var tokenRequest = AppUtils.RemovePrefixBearer(Request.Headers["Authorization"]!);
+                Console.WriteLine("Antes");
                 ClaimsPrincipal principal = _tokenService.GetClaimsPrincipalFromExpiredToken(tokenRequest, _configuration);
+                Console.WriteLine("Passou");
                 var idUserToken = principal.FindFirstValue("Id");
 
                 if (idUserToken is null)
@@ -139,8 +141,9 @@ namespace UsersFlow_API.Controllers
 
                 return Ok(new TokenDTO { Token = newUserToken, RefreshToken = newUserRefreshToken });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }

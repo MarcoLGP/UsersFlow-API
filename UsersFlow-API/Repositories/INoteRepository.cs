@@ -9,5 +9,6 @@ namespace UsersFlow_API.Repositories
         public Task removeNote(Note note);
         public Task updateNote(Note note);
         public Task<IEnumerable<Note>> getAllNotesByUser(int userId);
+        public Task<IEnumerable<Note>> getAllPublicNotes();
     }
 }

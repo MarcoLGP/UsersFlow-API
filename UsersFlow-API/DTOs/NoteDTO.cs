@@ -7,7 +7,6 @@ namespace UsersFlow_API.DTOs
         public int NoteId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
-        public bool Locked { get; set; }
         public bool Public { get; set; }
         public DateTime Created { get; set; }
     }
@@ -21,8 +20,6 @@ namespace UsersFlow_API.DTOs
         [MaxLength(400)]
         public string Content { get; set; }
         [Required]
-        public bool Locked { get; set; }
-        [Required]
         public bool Public { get; set; }
     }
 
@@ -34,8 +31,6 @@ namespace UsersFlow_API.DTOs
         [Required(ErrorMessage = "Content é obrigatório")]
         [MaxLength(400)]
         public string Content { get; set; }
-        [Required(ErrorMessage = "Locked é obrigatório")]
-        public bool Locked { get; set; }
         [Required(ErrorMessage = "Public é obrigatório")]
         public bool Public { get; set; }
 

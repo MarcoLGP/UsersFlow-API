@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections;
 using UsersFlow_API.Context;
 using UsersFlow_API.Models;
 
@@ -41,6 +40,12 @@ namespace UsersFlow_API.Repositories
         public async Task<IEnumerable<Note>> getAllNotesByUser(int userId)
         {
             var result = await _context.Notes.Where(c => c.UserId == userId).ToListAsync();
+            return result;
+        }
+
+        public async Task<IEnumerable<Note>> getAllPublicNotes()
+        {
+            var result = await _context.Notes.Where(c => c.Public).ToListAsync();
             return result;
         }
     }

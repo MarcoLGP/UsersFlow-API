@@ -55,7 +55,7 @@ namespace UsersFlow_API.Services
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(secretKey)),
-                ValidateLifetime = true
+                ValidateLifetime = false
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();

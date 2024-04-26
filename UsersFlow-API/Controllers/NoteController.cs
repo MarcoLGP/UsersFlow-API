@@ -40,6 +40,22 @@ namespace UsersFlow_API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route(template: "public/all")]
+        public async Task<ActionResult<IEnumerable<NoteDTO>>> GetAllPublic()
+        {
+            try
+            { 
+                var result = await _noteService.getAllPublicNotes();
+                return Ok(result);
+            }
+            catch (Exception) 
+            {
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
+            };
+        }
+
+
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] NewNoteDTO newNoteDTO)
         {
@@ -48,7 +64,7 @@ namespace UsersFlow_API.Controllers
                 var tokenRequest = AppUtils.RemovePrefixBearer(Request.Headers["Authorization"]!);
                 var intIdUser = AppUtils.GetIntTokenUserId(tokenRequest, _tokenService, _configuration);
 
-                Note newNote = new Note()
+                Note newNote = new()
                 {
                     Title = newNoteDTO.Title,
                     Content = newNoteDTO.Content,

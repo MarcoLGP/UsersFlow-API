@@ -40,7 +40,6 @@ namespace UsersFlow_API.Services
             note.Title = noteResumeDTO.Title;
             note.Content = noteResumeDTO.Content;
             note.Public = noteResumeDTO.Public;
-            note.Locked = noteResumeDTO.Locked;
 
             await _noteRepository.updateNote(note);
 
@@ -62,7 +61,27 @@ namespace UsersFlow_API.Services
                     NoteId = obj.NoteId,
                     Created = obj.Created,
                     Content = obj.Content,
-                    Locked = obj.Locked,
+                    Public = obj.Public
+                };
+            });
+        }
+
+        public async Task<IEnumerable<NoteDTO>?> getAllPublicNotes()
+        {
+            var result =  await _noteRepository.getAllPublicNotes();
+
+            if (!result.Any())
+                return null;
+
+
+            return result.Select(obj =>
+            {
+                return new NoteDTO
+                {
+                    Title = obj.Title,
+                    NoteId = obj.NoteId,
+                    Created = obj.Created,
+                    Content = obj.Content,
                     Public = obj.Public
                 };
             });
