@@ -18,7 +18,8 @@ Este projeto tem intuito de ajudar os devs iniciantes, simulando o mais próximo
 10) Caso na data em que esteja vendo a API e houver uma versão mais recente do .NET, atualiza-la.
 
 ## Considerações finais
-O projeto é nosso ! Sinta-se a vontade para modifica-lo como quiser e colocar a sua versão em produção.
+O projeto é nosso ! 
+Sinta-se a vontade para modifica-lo como quiser e colocar a sua versão em produção.
 
 ### Acima de tudo, porém, revistam-se do amor, que é o elo perfeito.
 ### Colossenses 3:14
