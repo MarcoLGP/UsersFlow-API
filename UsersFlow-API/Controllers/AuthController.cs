@@ -181,7 +181,6 @@ namespace UsersFlow_API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
                 return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }
