@@ -15,7 +15,8 @@ Este projeto tem intuito de ajudar os devs iniciantes, simulando o mais próximo
 7) Criptografar o conteúdo das notas privadas.
 8) Fazer o deploy da aplicação na AWS/Azure.
 9) Desevolva mecanismos de segurança para a API mais robustos utilizando o CORS.
-10) Caso na data em que esteja vendo a API e houver uma versão mais recente do .NET, atualiza-la.
+10) Investigar bugs na aplicação e corrigi-los.
+11) Caso na data em que esteja vendo a API e houver uma versão mais recente do .NET, atualiza-la.
 
 ## Considerações finais
 O projeto é nosso ! 
