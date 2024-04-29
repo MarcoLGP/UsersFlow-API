@@ -4,6 +4,7 @@ namespace UsersFlow_API.DTOs
 {
     public class NoteDTO
     {
+        public string Author { get; set; }
         public int NoteId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }

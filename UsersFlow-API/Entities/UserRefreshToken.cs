@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UsersFlow_API.Models
 {
@@ -8,7 +7,6 @@ namespace UsersFlow_API.Models
         [Key]
         public int RefreshTokenId { get; set; }
         [Required]
-        [Column(TypeName = "int")]
         public int UserId { get; set; }
         public User User { get; set; }
         [Required]

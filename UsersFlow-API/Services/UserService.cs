@@ -1,4 +1,6 @@
-﻿using UsersFlow_API.Repositories;
+﻿using UsersFlow_API.DTOs;
+using UsersFlow_API.Models;
+using UsersFlow_API.Repositories;
 
 namespace UsersFlow_API.Services
 {
@@ -65,6 +67,38 @@ namespace UsersFlow_API.Services
 
             if (_cryptoService.decrypt(userFound.Password) != oldPassword)
                 return false;
+
+            userFound.Password = _cryptoService.encrypt(newPassword);
+            await _userRepository.updateUser(userFound);
+            
+            return true;
+        }
+
+        public async Task<UserDTO?> getUserById(int userId)
+        {
+            var userFound =  await _userRepository.getUserById(userId);
+
+            if (userFound is null)
+                return null;
+
+            return new UserDTO
+            {
+                Name = userFound.Name,
+                Email = userFound.Email,
+            };
+        }
+
+        public async Task<User?> getUserByEmail(string email)
+        {
+            return await _userRepository.getUserByEmail(email);
+        }
+
+        public async Task<bool?> updateUserPasswordRecovery(int userId, string newPassword)
+        {
+            var userFound = await _userRepository.getUserById(userId);
+
+            if (userFound is null)
+                return null;
 
             userFound.Password = _cryptoService.encrypt(newPassword);
             await _userRepository.updateUser(userFound);

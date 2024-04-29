@@ -8,5 +8,6 @@ namespace UsersFlow_API.Services
         public JwtSecurityToken GenerateToken(IEnumerable<Claim> claims, IConfiguration configuration);
         public string GenerateRefreshToken();
         public ClaimsPrincipal GetClaimsPrincipalFromExpiredToken(string token, IConfiguration configuration);
+        public bool IsValidToken(string token, IConfiguration configuration);
     }
 }

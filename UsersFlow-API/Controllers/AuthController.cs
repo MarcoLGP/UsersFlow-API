@@ -16,18 +16,27 @@ namespace UsersFlow_API.Controllers
         private readonly ITokenService _tokenService;
         private readonly IConfiguration _configuration;
         private readonly IUserRefreshTokenService _userRefreshTokenService;
+        private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
+        private readonly IUserRecoveryPassTokenService _userRecoveryPassTokenService;
 
         public AuthController(
             IAuthService authService, 
             ITokenService tokenService, 
             IConfiguration configuration, 
-            IUserRefreshTokenService userRefreshTokenService
+            IUserRefreshTokenService userRefreshTokenService, 
+            IUserService userService,
+            IEmailService emailService,
+            IUserRecoveryPassTokenService userRecoveryPassTokenService
             )
         {
             _authService = authService;
             _tokenService = tokenService;
             _configuration = configuration;
             _userRefreshTokenService = userRefreshTokenService;
+            _userService = userService;
+            _emailService = emailService;
+            _userRecoveryPassTokenService = userRecoveryPassTokenService;
         }
 
         private string GenerateStringToken(int userId)
@@ -111,6 +120,37 @@ namespace UsersFlow_API.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet]
+        [Route(template: "check-token-recovery-password")]
+        public async Task<ActionResult> CheckToken()
+        {
+            try
+            {
+                var tokenRequest = AppUtils.RemovePrefixBearer(Request.Headers["Authorization"]!);
+                var userId = AppUtils.GetIntTokenUserId(tokenRequest, _tokenService, _configuration);
+
+                var isValidToken = _tokenService.IsValidToken(tokenRequest, _configuration);
+
+                if (!isValidToken) 
+                {
+                    await _userRecoveryPassTokenService.RemoveUserRecoveryPassToken(userId, tokenRequest);
+                    return Unauthorized();
+                }
+
+                var userTokenFound = _userRecoveryPassTokenService.CheckUserRecoveryPassToken(tokenRequest, userId);
+
+                if (userTokenFound is null)
+                    return Unauthorized();
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
+            }
+        }
+
         [HttpPost]
         [Route(template: "refresh-token")]
         public async Task<ActionResult<TokenDTO>> ValidateToken([FromBody] RefreshTokenDTO refreshTokenDTO)
@@ -118,9 +158,7 @@ namespace UsersFlow_API.Controllers
             try
             {
                 var tokenRequest = AppUtils.RemovePrefixBearer(Request.Headers["Authorization"]!);
-                Console.WriteLine("Antes");
                 ClaimsPrincipal principal = _tokenService.GetClaimsPrincipalFromExpiredToken(tokenRequest, _configuration);
-                Console.WriteLine("Passou");
                 var idUserToken = principal.FindFirstValue("Id");
 
                 if (idUserToken is null)
@@ -144,6 +182,34 @@ namespace UsersFlow_API.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
+            }
+        }
+
+        [HttpPost]
+        [Route(template: "forgot-password")]
+        public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordDTO forgotPasswordDTO)
+        {
+            try
+            {
+                var userFound = await _userService.getUserByEmail(forgotPasswordDTO.Email);
+
+                if (userFound is null)
+                {
+                    return NotFound();
+                }
+
+                string token = GenerateStringToken(userFound.UserId);
+                string subject = "Recuperação de senha";
+                string content = $"Para atualizar a sua senha entre no link: {forgotPasswordDTO.UrlBase}/{token}";
+                
+                await _emailService.SendEmailAsync(userFound.Email, subject, content);
+                await _userRecoveryPassTokenService.AddUserRecoveryPassToken(userFound.UserId, token);
+                
+                return Ok();
+            }
+            catch (Exception)
+            { 
                 return BadRequest(new MessageReturnDTO { Message = "Não foi possível processar a operação" });
             }
         }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -18,6 +19,13 @@ builder.Services.AddSwaggerGen();
 // Database context DI container
 builder.Services.AddDbContext<ApiDbContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("UsersFlowDB")));
+
+builder.Services.AddLocalization();
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture(culture: "pt-BR", uiCulture: "pt-BR");
+});
 
 // Configuration JWT Bearer
 var secretKey = builder.Configuration["JWT:SecretKey"] ?? throw new Exception("Invalid secret key !");
@@ -61,11 +69,14 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRefreshTokenService, UserRefreshTokenService>();
 builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<ICryptoService , CryptoService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserRecoveryPassTokenService, UserRecoveryPassTokenService>();
 
 // Aplication Repositories DI container
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRefreshTokenRepository, UserRefreshTokenRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
+builder.Services.AddScoped<IUserRecoveryPassTokenRepository, UserRecoveryPassTokenRepository>();
 
 var app = builder.Build();
 

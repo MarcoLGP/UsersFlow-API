@@ -24,13 +24,15 @@ namespace UsersFlow_API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<NoteDTO>>> Get()
+        public async Task<ActionResult<IEnumerable<NoteDTO>>> Get(
+            [FromQuery] int skip,
+            [FromQuery] int take = 20)
         {
             try
             {
                 var tokenRequest = AppUtils.RemovePrefixBearer(Request.Headers["Authorization"]!);
                 var intIdUser = AppUtils.GetIntTokenUserId(tokenRequest, _tokenService, _configuration);
-                var notes = await _noteService.getAllNotesByUser(intIdUser);
+                var notes = await _noteService.getAllNotesByUser(intIdUser, skip, take);
 
                 return Ok(notes);
             }
@@ -42,11 +44,13 @@ namespace UsersFlow_API.Controllers
 
         [HttpGet]
         [Route(template: "public/all")]
-        public async Task<ActionResult<IEnumerable<NoteDTO>>> GetAllPublic()
+        public async Task<ActionResult<IEnumerable<NoteDTO>>> GetAllPublic(
+            [FromQuery] int skip,
+            [FromQuery] int take = 20)
         {
             try
             { 
-                var result = await _noteService.getAllPublicNotes();
+                var result = await _noteService.getAllPublicNotes(skip, take);
                 return Ok(result);
             }
             catch (Exception) 
@@ -68,8 +72,9 @@ namespace UsersFlow_API.Controllers
                 {
                     Title = newNoteDTO.Title,
                     Content = newNoteDTO.Content,
-                    Created = DateTime.Now,
-                    UserId = intIdUser
+                    Created = DateTime.UtcNow,
+                    UserId = intIdUser,
+                    Public = newNoteDTO.Public
                 };
 
                 await _noteService.addNote(newNote);

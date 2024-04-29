@@ -46,9 +46,9 @@ namespace UsersFlow_API.Services
             return true;
         }
 
-        public async Task<IEnumerable<NoteDTO>?> getAllNotesByUser(int userId)
+        public async Task<IEnumerable<NoteDTO>?> getAllNotesByUser(int userId, int skip, int take)
         {
-            var notesFound = await _noteRepository.getAllNotesByUser(userId);
+            var notesFound = await _noteRepository.getAllNotesByUser(userId, skip, take);
 
             if (!notesFound.Any())
                 return null;
@@ -66,9 +66,9 @@ namespace UsersFlow_API.Services
             });
         }
 
-        public async Task<IEnumerable<NoteDTO>?> getAllPublicNotes()
+        public async Task<IEnumerable<NoteDTO>?> getAllPublicNotes(int skip, int take)
         {
-            var result =  await _noteRepository.getAllPublicNotes();
+            var result =  await _noteRepository.getAllPublicNotes(skip, take);
 
             if (!result.Any())
                 return null;
@@ -78,6 +78,7 @@ namespace UsersFlow_API.Services
             {
                 return new NoteDTO
                 {
+                    Author = obj.User.Name,
                     Title = obj.Title,
                     NoteId = obj.NoteId,
                     Created = obj.Created,

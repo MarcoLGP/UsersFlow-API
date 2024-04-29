@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UsersFlow_API.Context;
 
@@ -11,9 +12,11 @@ using UsersFlow_API.Context;
 namespace UsersFlow_API.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240427145808_UpdateEntitiesAddRecoveryPassToken")]
+    partial class UpdateEntitiesAddRecoveryPassToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,29 +24,6 @@ namespace UsersFlow_API.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("UsersFlow_API.Entities.UserRecoveryPassToken", b =>
-                {
-                    b.Property<int>("RecoveryPassTokenId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecoveryPassTokenId"));
-
-                    b.Property<string>("RecoveryPassToken")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RecoveryPassTokenId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserRecoveryPassTokens");
-                });
 
             modelBuilder.Entity("UsersFlow_API.Models.Note", b =>
                 {
@@ -117,8 +97,7 @@ namespace UsersFlow_API.Migrations
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -128,17 +107,6 @@ namespace UsersFlow_API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserRefreshTokens");
-                });
-
-            modelBuilder.Entity("UsersFlow_API.Entities.UserRecoveryPassToken", b =>
-                {
-                    b.HasOne("UsersFlow_API.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("UsersFlow_API.Models.Note", b =>

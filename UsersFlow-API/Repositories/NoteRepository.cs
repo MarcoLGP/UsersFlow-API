@@ -37,15 +37,30 @@ namespace UsersFlow_API.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Note>> getAllNotesByUser(int userId)
+        public async Task<IEnumerable<Note>> getAllNotesByUser(int userId, int skip, int take)
         {
-            var result = await _context.Notes.Where(c => c.UserId == userId).ToListAsync();
+            var result = await _context.Notes
+                .Where(c => c.UserId == userId)
+                .OrderByDescending(c => c.Created)
+                .Skip(skip)
+                .Take(take)
+                .AsNoTracking()
+                .ToListAsync();
+            
             return result;
         }
 
-        public async Task<IEnumerable<Note>> getAllPublicNotes()
+        public async Task<IEnumerable<Note>> getAllPublicNotes(int skip, int take)
         {
-            var result = await _context.Notes.Where(c => c.Public).ToListAsync();
+            var result = await _context.Notes
+                .Where(c => c.Public)
+                .OrderByDescending(c => c.Created)
+                .Include(c => c.User)
+                .Skip(skip)
+                .Take(take)
+                .AsNoTracking()
+                .ToListAsync();
+            
             return result;
         }
     }

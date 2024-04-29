@@ -71,5 +71,35 @@ namespace UsersFlow_API.Services
 
             return principal;
         }
+
+        public bool IsValidToken(string token, IConfiguration configuration)
+        {
+            var secretKey = configuration.GetSection("JWT").GetValue<string>("SecretKey") ?? throw new InvalidOperationException("Invalid Secret Key !");
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = true,
+                ValidateIssuer = true,
+                ValidAudience = configuration.GetSection("JWT").GetValue<string>("ValidAudience"),
+                ValidIssuer = configuration.GetSection("JWT").GetValue<string>("ValidIssuer"),
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(secretKey)),
+                ValidateLifetime = true
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+
+            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
+                !jwtSecurityToken.Header.Alg.Equals(
+                    SecurityAlgorithms.HmacSha256,
+                    StringComparison.CurrentCulture))
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
